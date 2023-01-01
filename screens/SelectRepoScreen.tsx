@@ -6,23 +6,38 @@ import { useUser } from '../auth'
 import { RootStackParamList } from '../navigation/stack'
 import UserReposList from '../components/UserReposList'
 import Repo from '../types/repo'
+import repoService from '../services/repoService'
+import useSelectedRepo from '../hooks/useSelectedRepo'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'select-repo'>
 
 export default function SelectRepoScreen({ navigation }: Props) {
   const { user } = useUser()
+  const {setRepo} = useSelectedRepo()
   const [modalVisible, setModalVisible] = useState(false)
   const [filter, setFilter] = useState('')
   const filterRepos = useCallback(
     (repo: Repo) => repo.name.toLowerCase().includes(filter.toLowerCase()),
     [filter]
   )
+  const handleSelectRepo = async (repo: Repo) => {
+    if (user) {
+      const isAstro = await repoService(user.login, repo.name).isAstroRepo()
+
+      if (!isAstro) {
+        alert(`${repo.name} is not an Astro project.`)
+      } else {
+        setRepo(repo)
+        navigation.replace('posts-list')
+      }
+    }
+  }
 
   useEffect(() => {
     if (!user) navigation.replace('sign-in')
   }, [user])
 
-  return (
+  return user ? (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Button
         onPress={() => setModalVisible(true)}
@@ -61,9 +76,9 @@ export default function SelectRepoScreen({ navigation }: Props) {
               />
             </View>
           </View>
-          <UserReposList filter={filterRepos} />
+          <UserReposList filter={filterRepos} onSelectRepo={handleSelectRepo} />
         </View>
       </Modal>
     </View>
-  )
+  ) : null
 }

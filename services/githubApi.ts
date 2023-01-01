@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { pick } from '../lib/helpers'
 import Repo from '../types/repo'
+import { RepoContents } from '../types/repoContents'
 import User from '../types/user'
 import * as tokenStorage from './tokenStorage'
 
@@ -43,6 +44,27 @@ export const getUser = async (): Promise<User | null> => {
       avatar: data.avatar_url,
       name: data.name
     }
+  }
+
+  return null
+}
+
+export const getRepoContents = async (
+  owner: string,
+  repoName: string
+): Promise<RepoContents[] | null> => {
+  const token = await tokenStorage.get()
+
+  if (token) {
+    const data = (
+      await api.get(`/repos/${owner}/${repoName}/contents`, {
+        headers: {
+          Authorization: `bearer ${token}`
+        }
+      })
+    ).data as any[]
+
+    return data.map((d) => pick(d, ['name', 'path', 'url', 'sha', 'type']))
   }
 
   return null

@@ -6,10 +6,10 @@ import Loading from './Loading'
 
 type Props = {
   filter?: (r: Repo) => boolean
-  onSelectRepo?: (repoId: number) => void
+  onSelectRepo?: (r: Repo) => void
 }
 
-const UserReposList: React.FC<Props> = ({ filter }) => {
+const UserReposList: React.FC<Props> = ({ filter, onSelectRepo }) => {
   const { data, isLoading, error, isError } = useQuery(
     ['repos'],
     () => githubApi.getRepos(),
@@ -40,7 +40,10 @@ const UserReposList: React.FC<Props> = ({ filter }) => {
         />
       )}
       renderItem={({ item }) => (
-        <Pressable style={{ paddingVertical: 16, paddingHorizontal: 18 }}>
+        <Pressable
+          onPress={() => onSelectRepo && onSelectRepo(item)}
+          style={{ paddingVertical: 16, paddingHorizontal: 18 }}
+        >
           <Text>{item.name}</Text>
         </Pressable>
       )}
