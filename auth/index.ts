@@ -1,11 +1,7 @@
 import { startAsync } from 'expo-auth-session'
 import { atom, useAtom } from 'jotai'
 import firebaseAuth from './firebase'
-import {
-  GithubAuthProvider,
-  signInWithCredential,
-  User
-} from 'firebase/auth'
+import { GithubAuthProvider, signInWithCredential, User } from 'firebase/auth'
 import github from '../constants/github'
 import { useEffect } from 'react'
 import * as tokenStorage from '../services/tokenStorage'
@@ -18,16 +14,16 @@ export const useUser = () => {
   const [user, setUser] = useAtom(userAtom)
 
   useEffect(() => {
-    firebaseAuth.onAuthStateChanged(async (state) => {
-      if (!!state) {
-        const token = await tokenStorage.get()
-        if (token) {
-          await signIn(token)
-          return
-        }
+    const unsub = firebaseAuth.onAuthStateChanged((user) => {
+      if (!!user) {
+        tokenStorage.get().then((token) => {
+          if (token) return signIn(token)
+        })
       }
-      setUser(state)
+      setUser(user)
     })
+
+    return unsub
   }, [])
 
   return user
@@ -52,7 +48,7 @@ export const signIn = async (token?: string) => {
       t = access_token
 
       if (t) {
-        tokenStorage.set(t!)
+        await tokenStorage.set(t!)
         signIn(t)
       }
     }
