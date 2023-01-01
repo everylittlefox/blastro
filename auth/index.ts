@@ -8,10 +8,9 @@ import {
 } from 'firebase/auth'
 import github from '../constants/github'
 import { useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as tokenStorage from '../services/tokenStorage'
 
 const REDIRECT_URL = 'https://auth.expo.io/@everylittlefox/blastro'
-const STORAGE_KEY = 'blastro:github_token'
 
 const userAtom = atom<User | null>(null)
 
@@ -21,7 +20,7 @@ export const useUser = () => {
   useEffect(() => {
     firebaseAuth.onAuthStateChanged(async (state) => {
       if (!!state) {
-        const token = await AsyncStorage.getItem(STORAGE_KEY)
+        const token = await tokenStorage.get()
         if (token) {
           await signIn(token)
           return
@@ -53,7 +52,7 @@ export const signIn = async (token?: string) => {
       t = access_token
 
       if (t) {
-        AsyncStorage.setItem(STORAGE_KEY, t!)
+        tokenStorage.set(t!)
         signIn(t)
       }
     }
@@ -66,7 +65,7 @@ export const signIn = async (token?: string) => {
 }
 
 export const signOut = async () => {
-  await AsyncStorage.removeItem(STORAGE_KEY)
+  await tokenStorage.clear()
   await firebaseAuth.signOut()
 }
 
