@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { View, Text, Button, Modal, TextInput, Pressable } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import FA from '@expo/vector-icons/FontAwesome'
@@ -28,14 +28,9 @@ export default function SelectRepoScreen({ navigation }: Props) {
         alert(`${repo.name} is not an Astro project.`)
       } else {
         setRepo(repo)
-        navigation.replace('posts-list')
       }
     }
   }
-
-  useEffect(() => {
-    if (!user) navigation.replace('sign-in')
-  }, [user])
 
   return user ? (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

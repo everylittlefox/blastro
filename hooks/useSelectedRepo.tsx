@@ -8,10 +8,12 @@ const selectedRepoAtom = atom<Repo | null>(null)
 export default function useSelectedRepo() {
   const [repo, setRepo] = useAtom(selectedRepoAtom)
 
-  // useEffect(() => {})
-
   useEffect(() => {
-    repo && repoStorage.set(repo.name)
+    if (!repo) {
+      repoStorage.get().then((repo) => {
+        repo && setRepo(repo)
+      })
+    } else repoStorage.set(repo)
   }, [repo])
 
   return { repo, setRepo }

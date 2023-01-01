@@ -4,7 +4,7 @@ import github from '../constants/github'
 import * as tokenStorage from '../services/tokenStorage'
 import * as githubApi from '../services/githubApi'
 import User from '../types/user'
-import { useEffect, } from 'react'
+import { useEffect } from 'react'
 
 const REDIRECT_URL = 'https://auth.expo.io/@everylittlefox/blastro'
 
@@ -15,16 +15,15 @@ const userLoadingAtom = atom(false)
 
 export const useUser = () => {
   const [user] = useAtom(userAtom)
-  const [loading, setLoading] = useAtom(userLoadingAtom)
+  const [loading] = useAtom(userLoadingAtom)
   const signIn = useSignIn()
 
   useEffect(() => {
-    setLoading(true)
-    tokenStorage.get().then((token) => {
-      if (!token) setLoading(false)
-      else signIn(token)
-    })
-  }, [])
+    if (!user)
+      tokenStorage.get().then((token) => {
+        if (token) signIn(token)
+      })
+  }, [user])
 
   return { user, loading }
 }
