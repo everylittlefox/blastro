@@ -4,33 +4,39 @@ import github from '../constants/github'
 import * as tokenStorage from '../services/tokenStorage'
 import * as githubApi from '../services/githubApi'
 import User from '../types/user'
-import { useEffect } from 'react'
+import { useEffect, } from 'react'
 
 const REDIRECT_URL = 'https://auth.expo.io/@everylittlefox/blastro'
 
 const userAtom = atom<User | null>(null)
+const useSetUser = () => useAtom(userAtom)[1]
+
+const userLoadingAtom = atom(false)
+
 export const useUser = () => {
   const [user] = useAtom(userAtom)
+  const [loading, setLoading] = useAtom(userLoadingAtom)
   const signIn = useSignIn()
 
   useEffect(() => {
+    setLoading(true)
     tokenStorage.get().then((token) => {
-      token && signIn(token)
+      if (!token) setLoading(false)
+      else signIn(token)
     })
   }, [])
 
-  return user
+  return { user, loading }
 }
-const useSetUser = () => useAtom(userAtom)[1]
-
-export const isOnline = atom((get) => get(userAtom) !== null)
 
 export const useSignIn = () => {
   const setUser = useSetUser()
+  const setUserLoading = useAtom(userLoadingAtom)[1]
 
   const signIn = async (token?: string) => {
     let t = token
 
+    setUserLoading(true)
     if (!t) {
       const response = (await startAsync({
         authUrl: authUrlWithId(github.id)
@@ -51,6 +57,7 @@ export const useSignIn = () => {
 
     const user = await githubApi.getUser()
     setUser(user)
+    setUserLoading(false)
   }
 
   return signIn
@@ -58,10 +65,13 @@ export const useSignIn = () => {
 
 export const useSignOut = () => {
   const setUser = useSetUser()
+  const setUserLoading = useAtom(userLoadingAtom)[1]
 
   return async () => {
+    setUserLoading(true)
     await tokenStorage.clear()
     setUser(null)
+    setUserLoading(false)
   }
 }
 

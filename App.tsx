@@ -7,7 +7,8 @@ import {
   Text,
   View,
   SafeAreaView,
-  Pressable
+  Pressable,
+  ActivityIndicator
 } from 'react-native'
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import { useUser, useSignIn, useSignOut } from './auth'
@@ -16,9 +17,16 @@ import * as githubApi from './services/githubApi'
 const queryClient = new QueryClient()
 
 export default function App() {
-  const user = useUser()
+  const { user, loading } = useUser()
   const signIn = useSignIn()
   const signOut = useSignOut()
+
+  if (loading)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size='large' />
+      </View>
+    )
 
   return (
     <QueryClientProvider client={queryClient}>
