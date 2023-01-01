@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { View, Button, Text } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useSignOut, useUser } from '../auth'
-import Repos from '../components/UserReposList'
+import UserReposList from '../components/UserReposList'
 import { RootStackParamList } from '../navigation/stack'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'home'>
@@ -28,7 +28,7 @@ export default function HomeScreen({ navigation }: Props) {
         <Text style={{ fontSize: 20 }}>{user?.name}</Text>
         <Button onPress={signOut} title="logout" />
       </View>
-      <Repos />
+      <UserReposList />
     </View>
   )
 }

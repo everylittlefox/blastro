@@ -1,15 +1,29 @@
 import { View, FlatList, Pressable, Text } from 'react-native'
 import { useQuery } from 'react-query'
 import * as githubApi from '../services/githubApi'
+import Repo from '../types/repo'
 import Loading from './Loading'
 
-const Repos: React.FC = () => {
-  const { data, isLoading, error } = useQuery(['repos'], () =>
-    githubApi.getRepos()
+type Props = {
+  filter?: (r: Repo) => boolean
+  onSelectRepo?: (repoId: number) => void
+}
+
+const UserReposList: React.FC<Props> = ({ filter }) => {
+  const { data, isLoading, error, isError } = useQuery(
+    ['repos'],
+    () => githubApi.getRepos(),
+    filter ? { select: (data) => data?.filter(filter) } : undefined
   )
 
-  if (isLoading)
-    return <Loading />
+  if (isError)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>{String(error)}</Text>
+      </View>
+    )
+
+  if (isLoading) return <Loading />
 
   return data ? (
     <FlatList
@@ -26,7 +40,7 @@ const Repos: React.FC = () => {
         />
       )}
       renderItem={({ item }) => (
-        <Pressable style={{ padding: 16 }}>
+        <Pressable style={{ paddingVertical: 16, paddingHorizontal: 18 }}>
           <Text>{item.name}</Text>
         </Pressable>
       )}
@@ -34,4 +48,4 @@ const Repos: React.FC = () => {
   ) : null
 }
 
-export default Repos
+export default UserReposList

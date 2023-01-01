@@ -12,7 +12,7 @@ export default function SignInScreen({ navigation }: Props) {
   const signIn = useSignIn()
 
   useEffect(() => {
-    if (user) navigation.replace('home')
+    if (user) navigation.replace('select-repo')
   }, [user])
 
   if (loading) return <Loading />
