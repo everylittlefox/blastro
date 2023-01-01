@@ -1,68 +1,68 @@
 import { startAsync } from 'expo-auth-session'
 import { atom, useAtom } from 'jotai'
-import firebaseAuth from './firebase'
-import { GithubAuthProvider, signInWithCredential, User } from 'firebase/auth'
 import github from '../constants/github'
-import { useEffect } from 'react'
 import * as tokenStorage from '../services/tokenStorage'
+import * as githubApi from '../services/githubApi'
+import User from '../types/user'
+import { useEffect } from 'react'
 
 const REDIRECT_URL = 'https://auth.expo.io/@everylittlefox/blastro'
 
 const userAtom = atom<User | null>(null)
-
 export const useUser = () => {
-  const [user, setUser] = useAtom(userAtom)
+  const [user] = useAtom(userAtom)
+  const signIn = useSignIn()
 
   useEffect(() => {
-    const unsub = firebaseAuth.onAuthStateChanged((user) => {
-      if (!!user) {
-        tokenStorage.get().then((token) => {
-          if (token) return signIn(token)
-        })
-      }
-      setUser(user)
+    tokenStorage.get().then((token) => {
+      token && signIn(token)
     })
-
-    return unsub
   }, [])
 
   return user
 }
-
-export const useSession = () => {
-  return useAtom(userAtom)
-}
+const useSetUser = () => useAtom(userAtom)[1]
 
 export const isOnline = atom((get) => get(userAtom) !== null)
 
-export const signIn = async (token?: string) => {
-  let t = token
+export const useSignIn = () => {
+  const setUser = useSetUser()
 
-  if (!t) {
-    const response = (await startAsync({
-      authUrl: authUrlWithId(github.id)
-    })) as any
+  const signIn = async (token?: string) => {
+    let t = token
 
-    if (response.params && response.params.code) {
-      const { access_token } = await createTokenWithCode(response.params.code)
-      t = access_token
+    if (!t) {
+      const response = (await startAsync({
+        authUrl: authUrlWithId(github.id)
+      })) as any
 
-      if (t) {
-        await tokenStorage.set(t!)
-        signIn(t)
+      if (response.params && response.params.code) {
+        const { access_token } = await createTokenWithCode(response.params.code)
+        t = access_token
+
+        if (t) {
+          await tokenStorage.set(t!)
+          signIn(t)
+        }
       }
+
+      return
     }
 
-    return
+    const user = await githubApi.getUser()
+    setUser(user)
   }
 
-  const credential = GithubAuthProvider.credential(t)
-  await signInWithCredential(firebaseAuth, credential)
+  return signIn
 }
 
-export const signOut = async () => {
-  await tokenStorage.clear()
-  await firebaseAuth.signOut()
+export const useSignOut = () => {
+  const setUser = useSetUser()
+
+  return async () => {
+    await tokenStorage.clear()
+    setUser(null)
+  }
 }
 
 function authUrlWithId(id: string) {

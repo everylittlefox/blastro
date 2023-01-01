@@ -10,13 +10,15 @@ import {
   Pressable
 } from 'react-native'
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
-import { useUser, useSession, signIn, signOut } from './auth'
+import { useUser, useSignIn, useSignOut } from './auth'
 import * as githubApi from './services/githubApi'
 
 const queryClient = new QueryClient()
 
 export default function App() {
   const user = useUser()
+  const signIn = useSignIn()
+  const signOut = useSignOut()
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -31,7 +33,7 @@ export default function App() {
                 paddingHorizontal: 16
               }}
             >
-              <Text style={{ fontSize: 20 }}>{user.displayName}</Text>
+              <Text style={{ fontSize: 20 }}>{user.name}</Text>
               <Button onPress={signOut} title="logout" />
             </View>
             <Repos />
