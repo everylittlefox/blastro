@@ -3,9 +3,12 @@
     "name": "blastro",
     "slug": "blastro",
     "version": "1.0.0",
+    "scheme": "blastro",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "currentFullName": "@everylittlefox/blastro",
+    "originalFullName": "@everylittlefox/blastro",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -24,10 +27,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.everylittlefox.blastro"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "04335fc8-a480-4933-bca3-8079ab528c41"
+      }
     }
   }
 }
