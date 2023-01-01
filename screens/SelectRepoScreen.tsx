@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { View, Text, Button, Modal, TextInput } from 'react-native'
+import { View, Text, Button, Modal, TextInput, Pressable } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import FA from '@expo/vector-icons/FontAwesome'
 import { useUser } from '../auth'
 import { RootStackParamList } from '../navigation/stack'
 import UserReposList from '../components/UserReposList'
@@ -34,6 +35,11 @@ export default function SelectRepoScreen({ navigation }: Props) {
       >
         <View style={{ flex: 1 }}>
           <View style={{ paddingHorizontal: 18 }}>
+            <View style={{ paddingVertical: 36 }}>
+              <Pressable onPress={() => setModalVisible(false)}>
+                <FA name="long-arrow-left" color="gray" size={24} />
+              </Pressable>
+            </View>
             <Text style={{ paddingTop: 30, fontSize: 24 }}>projects</Text>
             <View
               style={{
