@@ -11,6 +11,18 @@ export default class AstroRepoService {
     this.checkPages = checkPages
   }
 
+  async getLogs() {
+    if (this.checkPages) {
+      return await this.logsWithCorrespondingPages()
+    }
+
+    return await this.getLogDirs()
+  }
+
+  async getLogEntries(log: string) {
+    return await this.getRepoContents('src/blastro/'+log)
+  }
+
   private async hasBlastro() {
     const contents = await this.getRepoContents('src')
 
@@ -54,14 +66,6 @@ export default class AstroRepoService {
 
   private async getRepoContents(path: string) {
     return await getRepoContents(this.owner, this.name, path)
-  }
-
-  async getLogs() {
-    if (this.checkPages) {
-      return await this.logsWithCorrespondingPages()
-    }
-
-    return await this.getLogDirs()
   }
 }
 

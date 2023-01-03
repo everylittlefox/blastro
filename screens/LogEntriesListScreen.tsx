@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { View, Text, Button, FlatList, Pressable } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/stack'
@@ -9,28 +9,23 @@ import { useQuery } from 'react-query'
 import Loading from '../components/Loading'
 import ListSeparator from '../components/ListSeparator'
 
-type Props = NativeStackScreenProps<RootStackParamList, 'logs-list'>
+type Props = NativeStackScreenProps<RootStackParamList, 'entries-list'>
 
-export default function LogsListScreen({ navigation }: Props) {
+export default function LogEntriesScreen({ navigation, route }: Props) {
   const { user } = useUser()
   const { repo } = useSelectedRepo()
   const astroRepoService = useRef(new AstroRepoService(user!.login, repo!.name))
   const {
-    data: logs,
+    data: entries,
     isLoading,
     error
-  } = useQuery([user?.login, 'logs'], () => astroRepoService.current.getLogs())
-
-  const handleSelectRepo = useCallback(
-    (log: string) => {
-      navigation.push('entries-list', { log })
-    },
-    [navigation]
+  } = useQuery([user?.login, 'logs', route.params.log], () =>
+    astroRepoService.current.getLogEntries(route.params.log)
   )
 
   useEffect(() => {
-    if (repo) navigation.setOptions({ title: repo.name })
-  }, [repo])
+    navigation.setOptions({ title: route.params.log })
+  }, [route.params.log])
 
   if (isLoading) return <Loading />
 
@@ -44,18 +39,16 @@ export default function LogsListScreen({ navigation }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={logs}
-        keyExtractor={(item) => item}
+        data={entries}
+        keyExtractor={(item) => item.sha}
         ItemSeparatorComponent={ListSeparator}
         renderItem={({ item }) => (
-          <Pressable
-            onPress={() => handleSelectRepo(item)}
-            style={{ paddingVertical: 16, paddingHorizontal: 18 }}
-          >
-            <Text style={{ fontSize: 18 }}>{item}</Text>
+          <Pressable style={{ paddingVertical: 16, paddingHorizontal: 18 }}>
+            <Text style={{ fontSize: 18 }}>{item.name}</Text>
           </Pressable>
         )}
       />
+      {/* <Text style={{ fontSize: 18 }}>{route.params.log}</Text> */}
     </View>
   )
 }

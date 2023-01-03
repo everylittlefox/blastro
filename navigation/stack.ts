@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 export type RootStackParamList = {
-  home: undefined
+  'entries-list': { log: string }
   'sign-in': undefined
   loading: undefined
-  'posts-list': undefined
+  'logs-list': undefined
   'select-repo': undefined
 }
 
