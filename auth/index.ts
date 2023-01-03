@@ -54,8 +54,14 @@ export const useSignIn = () => {
       return
     }
 
-    const user = await githubApi.getUser()
-    setUser(user)
+    try {
+      const user = await githubApi.getUser()
+      setUser(user)
+    } catch {
+      await tokenStorage.clear()
+      alert('an error occurred while recovering user.')
+    }
+
     setUserLoading(false)
   }
 
