@@ -6,7 +6,7 @@ import { useUser } from '../auth'
 import { RootStackParamList } from '../navigation/stack'
 import UserReposList from '../components/UserReposList'
 import Repo from '../types/repo'
-import repoService from '../services/repoService'
+import { isAstroRepo } from '../services/astroRepoService'
 import useSelectedRepo from '../hooks/useSelectedRepo'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'select-repo'>
@@ -22,7 +22,7 @@ export default function SelectRepoScreen({ navigation }: Props) {
   )
   const handleSelectRepo = async (repo: Repo) => {
     if (user) {
-      const isAstro = await repoService(user.login, repo.name).isAstroRepo()
+      const isAstro = await isAstroRepo(user.login, repo.name)
 
       if (!isAstro) {
         alert(`${repo.name} is not an Astro project.`)

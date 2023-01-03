@@ -3,7 +3,7 @@ import { Button } from 'react-native'
 import { useSignOut, useUser } from '../auth'
 import useSelectedRepo from '../hooks/useSelectedRepo'
 import LoadingScreen from '../screens/LoadingScreen'
-import PostsListScreen from '../screens/PostsListScreen'
+import LogsListScreen from '../screens/LogsListScreen'
 import SelectRepoScreen from '../screens/SelectRepoScreen'
 import SignInScreen from '../screens/SignInScreen'
 import { Stack } from './stack'
@@ -31,7 +31,7 @@ export default function AppNavigation() {
                 )
               }}
               name="posts-list"
-              component={PostsListScreen}
+              component={LogsListScreen}
             />
           ) : (
             <Stack.Screen name="select-repo" component={SelectRepoScreen} />

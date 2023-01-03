@@ -2,6 +2,7 @@ import { View, FlatList, Pressable, Text } from 'react-native'
 import { useQuery } from 'react-query'
 import * as githubApi from '../services/githubApi'
 import Repo from '../types/repo'
+import ListSeparator from './ListSeparator'
 import Loading from './Loading'
 
 type Props = {
@@ -30,15 +31,7 @@ const UserReposList: React.FC<Props> = ({ filter, onSelectRepo }) => {
       style={{ flex: 1 }}
       data={data}
       keyExtractor={(d) => d.id.toString()}
-      ItemSeparatorComponent={() => (
-        <View
-          style={{
-            height: 1,
-            backgroundColor: 'lightgray',
-            marginHorizontal: 8
-          }}
-        />
-      )}
+      ItemSeparatorComponent={ListSeparator}
       renderItem={({ item }) => (
         <Pressable
           onPress={() => onSelectRepo && onSelectRepo(item)}
