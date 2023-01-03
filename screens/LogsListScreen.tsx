@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/stack'
 import useSelectedRepo from '../hooks/useSelectedRepo'
 import { useUser } from '../auth'
-import AstroRepoService from '../services/astroRepoService'
+import BlastroRepoService from '../services/BlastroRepoService'
 import { useQuery } from 'react-query'
 import Loading from '../components/Loading'
 import ListSeparator from '../components/ListSeparator'
@@ -14,7 +14,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'logs-list'>
 export default function LogsListScreen({ navigation }: Props) {
   const { user } = useUser()
   const { repo } = useSelectedRepo()
-  const astroRepoService = useRef(new AstroRepoService(user!.login, repo!.name))
+  const astroRepoService = useRef(new BlastroRepoService(user!.login, repo!.name))
   const {
     data: logs,
     isLoading,

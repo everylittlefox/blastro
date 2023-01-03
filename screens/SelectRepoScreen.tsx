@@ -6,7 +6,7 @@ import { useUser } from '../auth'
 import { RootStackParamList } from '../navigation/stack'
 import UserReposList from '../components/UserReposList'
 import Repo from '../types/repo'
-import { isAstroRepo } from '../services/astroRepoService'
+import { isAstroRepo } from '../services/BlastroRepoService'
 import useSelectedRepo from '../hooks/useSelectedRepo'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'select-repo'>

@@ -1,6 +1,18 @@
+import { decodeBase64 } from '../lib/helpers'
+import { RepoContents } from '../types/repoContents'
 import { getRepoContents } from './githubApi'
 
-export default class AstroRepoService {
+type LogProperty = {
+  name: string
+  type: 'string' | 'number' | 'date'
+  defaultValue?: string
+}
+
+type BlastroLog = { title: string; properties: LogProperty[] }
+
+export type BlastroProperties = BlastroLog[]
+
+export default class BlastroRepoService {
   owner: string
   name: string
   checkPages: boolean
@@ -17,6 +29,35 @@ export default class AstroRepoService {
     }
 
     return await this.getLogDirs()
+  }
+
+  async getBlastroProperties() {
+    if (await this.hasBlastro()) {
+      try {
+        const contents = (await this.getRepoContents(
+          'src/blastro/blastro.json'
+        )) as RepoContents
+
+        if (contents && contents.content) {
+          const blastroJson = decodeBase64(contents.content)
+
+          return JSON.parse(blastroJson) as BlastroProperties
+        }
+      } catch (e) {
+        console.log(e)
+        return null
+      }
+    }
+
+    return null
+  }
+
+  async getLogProperties(title: string) {
+    const blastroProperties = await this.getBlastroProperties()
+
+    return blastroProperties
+      ? blastroProperties.find((lp) => lp.title === title)
+      : null
   }
 
   async getLogEntries(log: string) {

@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/stack'
 import useSelectedRepo from '../hooks/useSelectedRepo'
 import { useUser } from '../auth'
-import AstroRepoService from '../services/astroRepoService'
+import BlastroRepoService from '../services/BlastroRepoService'
 import { useQuery } from 'react-query'
 import Loading from '../components/Loading'
 import ListSeparator from '../components/ListSeparator'
@@ -16,16 +16,30 @@ type Props = NativeStackScreenProps<RootStackParamList, 'entries-list'>
 export default function LogEntriesScreen({ navigation, route }: Props) {
   const { user } = useUser()
   const { repo } = useSelectedRepo()
-  const astroRepoService = useRef(new AstroRepoService(user!.login, repo!.name))
+  const astroRepoService = useRef(
+    new BlastroRepoService(user!.login, repo!.name)
+  )
   const { data, isLoading, error } = useQuery(
-    [user?.login, 'logs', route.params.log],
+    [user?.login, 'logs', route.params.log, 'entries'],
     () => astroRepoService.current.getLogEntries(route.params.log)
+  )
+  const { data: properties, error: ppError } = useQuery(
+    [user?.login, 'logs', route.params.log, 'properties'],
+    () => astroRepoService.current.getLogProperties(route.params.log)
   )
   const entries = data as RepoContents[]
 
   useEffect(() => {
     navigation.setOptions({ title: route.params.log })
   }, [route.params.log])
+
+  useEffect(() => {
+    console.log(ppError)
+  }, [ppError])
+
+  useEffect(() => {
+    console.log(properties)
+  }, [properties])
 
   if (isLoading) return <Loading />
 
