@@ -20,19 +20,35 @@ export default class AstroRepoService {
   }
 
   async getLogEntries(log: string) {
-    return await this.getRepoContents('src/blastro/'+log)
+    let entries = await this.getRepoContents('src/blastro/' + log)
+
+    if (entries && 'map' in entries) {
+      entries = entries.filter(
+        (e) =>
+          e.type === 'file' &&
+          e.name.substring(e.name.length - 3, e.name.length) === '.md'
+      )
+
+      return await Promise.all(entries.map((e) => this.getRepoContents(e.path)))
+    }
+
+    return null
   }
 
   private async hasBlastro() {
     const contents = await this.getRepoContents('src')
 
-    return contents && contents.some((rc) => rc.name === 'blastro')
+    return (
+      contents &&
+      'some' in contents &&
+      contents.some((rc) => rc.name === 'blastro')
+    )
   }
 
   private async logsWithCorrespondingPages() {
     const logDirs = await this.getLogDirs()
 
-    if (logDirs?.length) {
+    if (logDirs?.length && 'map' in logDirs) {
       const self = this
       const logPages = await Promise.all(
         logDirs.map((log) =>
@@ -48,7 +64,7 @@ export default class AstroRepoService {
         )
       )
 
-      return logPages.filter(Boolean).map(l => l as string)
+      return logPages.filter(Boolean).map((l) => l as string)
     }
 
     return null
@@ -58,7 +74,7 @@ export default class AstroRepoService {
     if (await this.hasBlastro()) {
       const contents = await this.getRepoContents('src/blastro')
 
-      return contents ? contents.map((c) => c.name) : null
+      return contents && 'map' in contents ? contents.map((c) => c.name) : null
     }
 
     return null
@@ -75,5 +91,9 @@ export async function isAstroRepo(
 ): Promise<boolean | null> {
   const contents = await getRepoContents(owner, name)
 
-  return contents && contents.some((rc) => rc.name === 'astro.config.mjs')
+  return (
+    contents &&
+    'some' in contents &&
+    contents.some((rc) => rc.name === 'astro.config.mjs')
+  )
 }

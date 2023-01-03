@@ -4,4 +4,5 @@ export interface RepoContents {
   url: string
   type: string
   sha: string
+  content: string
 }

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { View, Text, Button, FlatList, Pressable } from 'react-native'
+import React, { useCallback, useEffect, useRef } from 'react'
+import { View, Text, FlatList, Pressable } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/stack'
 import useSelectedRepo from '../hooks/useSelectedRepo'

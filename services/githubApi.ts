@@ -53,7 +53,7 @@ export const getRepoContents = async (
   owner: string,
   repoName: string,
   path = ''
-): Promise<RepoContents[] | null> => {
+): Promise<RepoContents[] | RepoContents | null> => {
   const token = await tokenStorage.get()
 
   if (token) {
@@ -65,7 +65,7 @@ export const getRepoContents = async (
       })
     ).data
 
-    const fields = ['name', 'path', 'url', 'sha', 'type']
+    const fields = ['name', 'path', 'url', 'sha', 'type', 'content']
     return 'map' in data
       ? data.map((d: any) => pick(d, fields))
       : pick(data, fields)

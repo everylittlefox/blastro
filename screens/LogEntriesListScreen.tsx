@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { View, Text, Button, FlatList, Pressable } from 'react-native'
+import React, { useEffect, useRef } from 'react'
+import { View, Text, FlatList, Pressable } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../navigation/stack'
 import useSelectedRepo from '../hooks/useSelectedRepo'
@@ -8,6 +8,8 @@ import AstroRepoService from '../services/astroRepoService'
 import { useQuery } from 'react-query'
 import Loading from '../components/Loading'
 import ListSeparator from '../components/ListSeparator'
+import { decodeBase64 } from '../lib/helpers'
+import { RepoContents } from '../types/repoContents'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'entries-list'>
 
@@ -15,13 +17,11 @@ export default function LogEntriesScreen({ navigation, route }: Props) {
   const { user } = useUser()
   const { repo } = useSelectedRepo()
   const astroRepoService = useRef(new AstroRepoService(user!.login, repo!.name))
-  const {
-    data: entries,
-    isLoading,
-    error
-  } = useQuery([user?.login, 'logs', route.params.log], () =>
-    astroRepoService.current.getLogEntries(route.params.log)
+  const { data, isLoading, error } = useQuery(
+    [user?.login, 'logs', route.params.log],
+    () => astroRepoService.current.getLogEntries(route.params.log)
   )
+  const entries = data as RepoContents[]
 
   useEffect(() => {
     navigation.setOptions({ title: route.params.log })
@@ -45,6 +45,7 @@ export default function LogEntriesScreen({ navigation, route }: Props) {
         renderItem={({ item }) => (
           <Pressable style={{ paddingVertical: 16, paddingHorizontal: 18 }}>
             <Text style={{ fontSize: 18 }}>{item.name}</Text>
+            <Text>{decodeBase64(item.content)}</Text>
           </Pressable>
         )}
       />
