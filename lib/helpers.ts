@@ -59,7 +59,7 @@ export const parseMarkdown = (
   }
 
   return {
-    content: m.replace(frontmatterRegex, ''),
+    content: m.replace(frontmatterRegex, '').trim(),
     frontmatter: [...frontmatter.entries()].reduce(
       (acc, [key, val]) => ({ ...acc, [key]: val }),
       {}

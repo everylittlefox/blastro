@@ -14,7 +14,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'logs-list'>
 export default function LogsListScreen({ navigation }: Props) {
   const { user } = useUser()
   const { repo } = useSelectedRepo()
-  const astroRepoService = useRef(new BlastroRepoService(user!.login, repo!.name))
+  const astroRepoService = useRef(
+    new BlastroRepoService(user!.login, repo!.name)
+  )
   const {
     data: logs,
     isLoading,
@@ -44,15 +46,21 @@ export default function LogsListScreen({ navigation }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
+        style={{ padding: 16 }}
         data={logs}
         keyExtractor={(item) => item}
-        ItemSeparatorComponent={ListSeparator}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
         renderItem={({ item }) => (
           <Pressable
+            style={{
+              paddingVertical: 16,
+              paddingHorizontal: 18,
+              backgroundColor: 'white',
+              borderRadius: 16
+            }}
             onPress={() => handleSelectRepo(item)}
-            style={{ paddingVertical: 16, paddingHorizontal: 18 }}
           >
-            <Text style={{ fontSize: 18 }}>{item}</Text>
+            <Text style={{ fontSize: 16 }}>{item}</Text>
           </Pressable>
         )}
       />

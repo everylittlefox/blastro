@@ -6,6 +6,7 @@ import * as repoStorage from '../services/repoStorage'
 import * as githubApi from '../services/githubApi'
 import User from '../types/user'
 import { useEffect } from 'react'
+import useSelectedRepo from '../hooks/useSelectedRepo'
 
 const REDIRECT_URL = 'https://auth.expo.io/@everylittlefox/blastro'
 
@@ -72,11 +73,13 @@ export const useSignIn = () => {
 export const useSignOut = () => {
   const setUser = useSetUser()
   const setUserLoading = useAtom(userLoadingAtom)[1]
+  const { setRepo } = useSelectedRepo()
 
   return async () => {
     setUserLoading(true)
     await tokenStorage.clear()
     await repoStorage.clear()
+    setRepo(null)
     setUser(null)
     setUserLoading(false)
   }

@@ -52,9 +52,10 @@ export default function LogEntriesScreen({ navigation, route }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
+        style={{ padding: 16 }}
         data={entries}
         keyExtractor={(item) => item.sha}
-        ItemSeparatorComponent={ListSeparator}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
         renderItem={({ item }) => {
           const md = parseMarkdown(decodeBase64(item.content))
           return (
@@ -70,10 +71,32 @@ export default function LogEntriesScreen({ navigation, route }: Props) {
                   }
                 })
               }
-              style={{ paddingVertical: 16, paddingHorizontal: 18 }}
+              style={{
+                paddingVertical: 16,
+                paddingHorizontal: 18,
+                backgroundColor: 'white',
+                borderRadius: 16
+              }}
             >
-              <Text style={{ fontSize: 18 }}>{item.name}</Text>
-              <Text>{md.content}</Text>
+              <Text
+                style={{
+                  color: 'gray',
+                  fontWeight: 'bold',
+                  paddingVertical: 4
+                }}
+              >
+                {item.name}
+              </Text>
+              <Text
+                numberOfLines={10}
+                style={{
+                  paddingVertical: 6,
+                  fontFamily: 'EBGaramond_400Regular',
+                  fontSize: 16
+                }}
+              >
+                {md.content}
+              </Text>
             </Pressable>
           )
         }}

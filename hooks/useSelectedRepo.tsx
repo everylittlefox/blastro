@@ -13,7 +13,7 @@ export default function useSelectedRepo() {
       repoStorage.get().then((repo) => {
         repo && setRepo(repo)
       })
-    } else repoStorage.set(repo)
+    }
   }, [repo])
 
   return { repo, setRepo }

@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native'
-import { Button } from 'react-native'
+import { Button, Pressable, Text, View } from 'react-native'
+import { useFonts, EBGaramond_400Regular } from '@expo-google-fonts/eb-garamond'
 import { useSignOut, useUser } from '../auth'
 import useSelectedRepo from '../hooks/useSelectedRepo'
 import CreateUpdateLogScreen from '../screens/CreateUpdateLogScreen'
@@ -14,11 +15,19 @@ export default function AppNavigation() {
   const { user, loading } = useUser()
   const { repo } = useSelectedRepo()
   const signOut = useSignOut()
+  const [fontsLoaded] = useFonts({ EBGaramond_400Regular })
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        {loading ? (
+      <Stack.Navigator
+        screenOptions={{
+          headerTitle(props) {
+            return <Text {...props} style={{ fontSize: 18 }} />
+          },
+          headerShadowVisible: false
+        }}
+      >
+        {loading || !fontsLoaded ? (
           <Stack.Screen
             options={{ headerShown: false }}
             name="loading"
@@ -30,17 +39,26 @@ export default function AppNavigation() {
               <Stack.Screen
                 options={{
                   headerRight: (props) => (
-                    <Button {...props} title="logout" onPress={signOut} />
+                    <Pressable {...props} onPress={signOut}>
+                      <Text>logout</Text>
+                    </Pressable>
                   )
                 }}
                 name="logs-list"
                 component={LogsListScreen}
               />
               <Stack.Screen name="entries-list" component={LogEntriesScreen} />
-              <Stack.Screen name='create-update-log' component={CreateUpdateLogScreen} />
+              <Stack.Screen
+                name="create-update-log"
+                component={CreateUpdateLogScreen}
+              />
             </>
           ) : (
-            <Stack.Screen name="select-repo" component={SelectRepoScreen} />
+            <Stack.Screen
+              name="select-repo"
+              component={SelectRepoScreen}
+              options={{ title: 'choose astro project' }}
+            />
           )
         ) : (
           <Stack.Screen

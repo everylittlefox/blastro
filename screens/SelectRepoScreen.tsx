@@ -8,13 +8,13 @@ import UserReposList from '../components/UserReposList'
 import Repo from '../types/repo'
 import { isAstroRepo } from '../services/BlastroRepoService'
 import useSelectedRepo from '../hooks/useSelectedRepo'
+import * as repoStorage from '../services/repoStorage'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'select-repo'>
 
 export default function SelectRepoScreen({ navigation }: Props) {
   const { user } = useUser()
-  const {setRepo} = useSelectedRepo()
-  const [modalVisible, setModalVisible] = useState(false)
+  const { setRepo } = useSelectedRepo()
   const [filter, setFilter] = useState('')
   const filterRepos = useCallback(
     (repo: Repo) => repo.name.toLowerCase().includes(filter.toLowerCase()),
@@ -28,52 +28,30 @@ export default function SelectRepoScreen({ navigation }: Props) {
         alert(`${repo.name} is not an Astro project.`)
       } else {
         setRepo(repo)
+        await repoStorage.set(repo)
       }
     }
   }
 
-  return user ? (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Button
-        onPress={() => setModalVisible(true)}
-        title="choose Astro project"
-      />
-      <Modal
-        animationType="slide"
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={{ flex: 1 }}>
-          <View style={{ paddingHorizontal: 18 }}>
-            <View style={{ paddingVertical: 36 }}>
-              <Pressable onPress={() => setModalVisible(false)}>
-                <FA name="long-arrow-left" color="gray" size={24} />
-              </Pressable>
-            </View>
-            <Text style={{ paddingTop: 30, fontSize: 24 }}>projects</Text>
-            <View
-              style={{
-                paddingVertical: 16
-              }}
-            >
-              <TextInput
-                style={{
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                  borderWidth: 1,
-                  borderColor: 'lightgray',
-                  fontSize: 20,
-                  borderRadius: 4
-                }}
-                cursorColor="gray"
-                value={filter}
-                onChangeText={setFilter}
-              />
-            </View>
-          </View>
-          <UserReposList filter={filterRepos} onSelectRepo={handleSelectRepo} />
-        </View>
-      </Modal>
+  return (
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={{ paddingHorizontal: 16, paddingVertical: 20 }}>
+        <TextInput
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 12,
+            borderWidth: 1,
+            borderColor: 'lightgray',
+            fontSize: 18,
+            borderRadius: 4
+          }}
+          cursorColor="gray"
+          value={filter}
+          onChangeText={setFilter}
+          placeholder="search repos..."
+        />
+      </View>
+      <UserReposList filter={filterRepos} onSelectRepo={handleSelectRepo} />
     </View>
-  ) : null
+  )
 }

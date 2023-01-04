@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Pressable,
@@ -17,6 +17,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'create-update-log'>
 export default function CreateUpdateLogScreen({ route, navigation }: Props) {
   const blastroLog = route.params.blastroLog
   const entry = route.params.entry
+  const [content, setContent] = useState(entry?.content)
 
   const entryPropertyValues = useMemo(() => {
     return entry?.properties
@@ -44,46 +45,60 @@ export default function CreateUpdateLogScreen({ route, navigation }: Props) {
     .map((epv) => epv!)
 
   useEffect(() => {
-    navigation.setOptions({
-      title: entry?.title
-        ? `${blastroLog.title}/${entry.title}`
-        : `new ${blastroLog.title}`
-    })
+    navigation.setOptions(
+      entry?.title
+        ? {
+            headerTitle: (props) => {
+              return (
+                <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                  <Text style={{ color: 'gray' }}>{blastroLog.title}/</Text>
+                  <Text style={{ fontSize: 18 }}>{entry.title}</Text>
+                </View>
+              )
+            }
+          }
+        : { title: `new ${blastroLog.title}` }
+    )
   }, [blastroLog.title, entry?.title])
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{
-          padding: 18
-        }}
-      >
-        <View style={{ flexDirection: 'row' }}>
-          {entryPropertyValues &&
-            entryPropertyValues.map(({ name, value }) => (
-              <Pressable
-                style={{
-                  borderWidth: 1,
-                  borderColor: 'lightgray',
-                  paddingVertical: 4,
-                  paddingHorizontal: 6,
-                  borderRadius: 4,
-                  flexDirection: 'row'
-                }}
-                key={`prop-${name}`}
-              >
-                <Text style={{ color: 'gray' }}>{name}</Text>
-                <PropertyValueText value={value} style={{ paddingLeft: 8 }} />
-              </Pressable>
-            ))}
-        </View>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: 'white',
+        paddingTop: 48,
+        paddingHorizontal: 18
+      }}
+    >
+      <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+        {entryPropertyValues &&
+          entryPropertyValues.map(({ name, value }) => (
+            <Pressable
+              style={{
+                borderWidth: 1,
+                borderColor: 'lightgray',
+                paddingVertical: 4,
+                paddingHorizontal: 6,
+                borderRadius: 4,
+                flexDirection: 'row'
+              }}
+              key={`prop-${name}`}
+            >
+              <Text style={{ color: 'gray' }}>{name}</Text>
+              <PropertyValueText value={value} style={{ paddingLeft: 8 }} />
+            </Pressable>
+          ))}
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
         <TextInput
           style={{
             paddingVertical: 20,
-            fontSize: 16
+            fontSize: 18,
+            fontFamily: 'EBGaramond_400Regular'
           }}
-          value={entry?.content}
+          value={content}
+          onChangeText={setContent}
           placeholder="body"
           multiline
         />

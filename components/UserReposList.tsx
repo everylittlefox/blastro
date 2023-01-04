@@ -28,14 +28,21 @@ const UserReposList: React.FC<Props> = ({ filter, onSelectRepo }) => {
 
   return data ? (
     <FlatList
-      style={{ flex: 1 }}
+      style={{ flex: 1, paddingHorizontal: 16, }}
       data={data}
       keyExtractor={(d) => d.id.toString()}
-      ItemSeparatorComponent={ListSeparator}
+      ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       renderItem={({ item }) => (
         <Pressable
           onPress={() => onSelectRepo && onSelectRepo(item)}
-          style={{ paddingVertical: 16, paddingHorizontal: 18 }}
+          style={{
+            paddingVertical: 16,
+            paddingHorizontal: 18,
+            backgroundColor: 'white',
+            borderWidth: 1,
+            borderColor: 'lightgray',
+            borderRadius: 16
+          }}
         >
           <Text>{item.name}</Text>
         </Pressable>
