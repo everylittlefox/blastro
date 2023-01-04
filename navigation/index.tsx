@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { Button } from 'react-native'
 import { useSignOut, useUser } from '../auth'
 import useSelectedRepo from '../hooks/useSelectedRepo'
+import CreateUpdateLogScreen from '../screens/CreateUpdateLogScreen'
 import LoadingScreen from '../screens/LoadingScreen'
 import LogEntriesScreen from '../screens/LogEntriesListScreen'
 import LogsListScreen from '../screens/LogsListScreen'
@@ -36,6 +37,7 @@ export default function AppNavigation() {
                 component={LogsListScreen}
               />
               <Stack.Screen name="entries-list" component={LogEntriesScreen} />
+              <Stack.Screen name='create-update-log' component={CreateUpdateLogScreen} />
             </>
           ) : (
             <Stack.Screen name="select-repo" component={SelectRepoScreen} />

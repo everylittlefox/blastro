@@ -2,13 +2,13 @@ import { decodeBase64 } from '../lib/helpers'
 import { RepoContents } from '../types/repoContents'
 import { getRepoContents } from './githubApi'
 
-type LogProperty = {
+export type LogProperty = {
   name: string
   type: 'string' | 'number' | 'date'
   defaultValue?: string
 }
 
-type BlastroLog = { title: string; properties: LogProperty[] }
+export type BlastroLog = { title: string; properties: LogProperty[] }
 
 export type BlastroProperties = BlastroLog[]
 
