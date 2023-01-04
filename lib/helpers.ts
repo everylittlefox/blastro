@@ -39,3 +39,47 @@ export const decodeBase64 = (input: string) => {
 
   return output
 }
+
+export const parseMarkdown = (
+  m: string
+): { content: string; frontmatter: Record<string, string> } => {
+  let frontmatter = new Map<string, string>()
+  const frontmatterRegex = /^---([\w\W\n]*)---/
+  const matchFrontmatter = m.match(frontmatterRegex)
+
+  if (matchFrontmatter) {
+    matchFrontmatter[1]
+      .split('\n')
+      .filter(Boolean)
+      .forEach((propLine) => {
+        const prop = propLine.split(':').map((part) => part.trim())
+
+        frontmatter.set(prop[0], prop[1])
+      })
+  }
+
+  return {
+    content: m.replace(frontmatterRegex, ''),
+    frontmatter: [...frontmatter.entries()].reduce(
+      (acc, [key, val]) => ({ ...acc, [key]: val }),
+      {}
+    )
+  }
+}
+
+const MONTHS_LIST =
+  'January, February, March, April, May, June, July, August, September, October, November, December'
+
+export const formatDate = (date: Date, mode: 'compact' | 'normal' = 'normal') => {
+  const months = MONTHS_LIST.split(', ')
+  let month = months[date.getMonth()]
+  const day = date.getDate()
+  let year = date.getFullYear()
+
+  if (mode === 'compact') {
+    month = month.substring(0,3)
+    year = year % 100
+  }
+
+  return `${month} ${day}, ${year}`
+}

@@ -1,58 +1,98 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useEffect } from 'react'
-import { View, Pressable, TextInput, Text } from 'react-native'
+import { useEffect, useMemo } from 'react'
+import {
+  View,
+  Pressable,
+  TextInput,
+  Text,
+  ScrollView,
+  TextProps
+} from 'react-native'
+import { formatDate } from '../lib/helpers'
 import { RootStackParamList } from '../navigation/stack'
 import { LogProperty } from '../services/BlastroRepoService'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'create-update-log'>
+type EntryProperty = {
+  name: string
+  type: 'string' | 'number' | 'date'
+  value: string | number | Date
+}
 
 export default function CreateUpdateLogScreen({ route, navigation }: Props) {
   const blastroLog = route.params.blastroLog
+  const entry = route.params.entry
+
+  const entryPropertyValues = useMemo(() => {
+    return entry?.properties
+      ? Object.keys(entry.properties).map((prop) => {
+          const type = blastroLog.properties.find((p) => p.name === prop)?.type
+
+          if (type)
+            return {
+              type,
+              value: evaluateValue(type, entry.properties[prop]),
+              name: prop
+            }
+
+          return null
+        })
+      : blastroLog.properties.map(({ name, defaultValue, type }) => {
+          return {
+            name,
+            type,
+            value: defaultValue ? evaluateValue(type, defaultValue) : ''
+          }
+        })
+  }, [entry?.properties, blastroLog.properties])
+    ?.filter(Boolean)
+    .map((epv) => epv!)
 
   useEffect(() => {
-    navigation.setOptions({ title: `new ${blastroLog.title}` })
-  }, [blastroLog.title])
+    navigation.setOptions({
+      title: entry?.title
+        ? `${blastroLog.title}/${entry.title}`
+        : `new ${blastroLog.title}`
+    })
+  }, [blastroLog.title, entry?.title])
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ padding: 18 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{
+          padding: 18
+        }}
+      >
         <View style={{ flexDirection: 'row' }}>
-          {blastroLog.properties.map((p) => (
-            <Pressable
-              style={{
-                borderWidth: 1,
-                borderColor: 'lightgray',
-                paddingVertical: 4,
-                paddingHorizontal: 6,
-                borderRadius: 4,
-                flexDirection: 'row'
-              }}
-              key={`prop-${p.name}`}
-            >
-              <Text style={{ color: 'gray' }}>{p.name}</Text>
-              {p.defaultValue && (
-                <Text style={{ paddingLeft: 8 }}>
-                  {evaluateValue('date', p.defaultValue).toDateString()}
-                </Text>
-              )}
-            </Pressable>
-          ))}
+          {entryPropertyValues &&
+            entryPropertyValues.map(({ name, value }) => (
+              <Pressable
+                style={{
+                  borderWidth: 1,
+                  borderColor: 'lightgray',
+                  paddingVertical: 4,
+                  paddingHorizontal: 6,
+                  borderRadius: 4,
+                  flexDirection: 'row'
+                }}
+                key={`prop-${name}`}
+              >
+                <Text style={{ color: 'gray' }}>{name}</Text>
+                <PropertyValueText value={value} style={{ paddingLeft: 8 }} />
+              </Pressable>
+            ))}
         </View>
-        <View
+        <TextInput
           style={{
-            paddingVertical: 8
+            paddingVertical: 20,
+            fontSize: 16
           }}
-        >
-          <TextInput
-            style={{
-              paddingVertical: 8,
-              fontSize: 20
-            }}
-            placeholder="body"
-            multiline
-          />
-        </View>
-      </View>
+          value={entry?.content}
+          placeholder="body"
+          multiline
+        />
+      </ScrollView>
     </View>
   )
 }
@@ -74,4 +114,12 @@ const evaluateValue = <T extends LogProperty['type'] = 'date'>(
     default:
       return value as Value<T>
   }
+}
+
+const PropertyValueText = ({
+  value,
+  ...props
+}: TextProps & { value: string | number | Date }) => {
+  const v = value instanceof Date ? formatDate(value) : value.toString()
+  return <Text {...props}>{v}</Text>
 }
