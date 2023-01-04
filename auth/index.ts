@@ -2,6 +2,7 @@ import { startAsync } from 'expo-auth-session'
 import { atom, useAtom } from 'jotai'
 import github from '../constants/github'
 import * as tokenStorage from '../services/tokenStorage'
+import * as repoStorage from '../services/repoStorage'
 import * as githubApi from '../services/githubApi'
 import User from '../types/user'
 import { useEffect } from 'react'
@@ -75,6 +76,7 @@ export const useSignOut = () => {
   return async () => {
     setUserLoading(true)
     await tokenStorage.clear()
+    await repoStorage.clear()
     setUser(null)
     setUserLoading(false)
   }

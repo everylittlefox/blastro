@@ -13,11 +13,6 @@ import { RootStackParamList } from '../navigation/stack'
 import { LogProperty } from '../services/BlastroRepoService'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'create-update-log'>
-type EntryProperty = {
-  name: string
-  type: 'string' | 'number' | 'date'
-  value: string | number | Date
-}
 
 export default function CreateUpdateLogScreen({ route, navigation }: Props) {
   const blastroLog = route.params.blastroLog
